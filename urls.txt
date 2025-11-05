@@ -1,0 +1,4 @@
+admin/ -> Admin page
+api/token/ -> Obtaining token 
+api/token/refresh/ -> Refreshing token
+api/user/register/ -> Registration
