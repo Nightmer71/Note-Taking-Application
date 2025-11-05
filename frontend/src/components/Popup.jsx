@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import "../styles/Popup.css";
 
 function Popup({ message, type = "info", visible, onClose, duration = 3000 }) {
   useEffect(() => {
