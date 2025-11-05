@@ -5,18 +5,17 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNotification } from "../components/NotificationProvider";
 import "../styles/Form.css";
 
-function Form({ route, method }) {
+function Form({ route, method, onSwitch }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState(method || "login");
+
   const navigate = useNavigate();
   const { notify } = useNotification();
-  const apiRoute = mode === "login" ? "/api/token/" : "/api/user/register/";
-  const name = mode === "login" ? "Login" : "Register";
-
-  const toggleMode = () =>
-    setMode((m) => (m === "login" ? "register" : "login"));
+  const apiRoute = route;
+  const name = method === "login" ? "Login" : "Register";
+  const switchButtonText =
+    method === "login" ? "Switch to Register" : "Switch to Login";
 
   const handleSubmit = async (e) => {
     setLoading(true);
@@ -24,16 +23,17 @@ function Form({ route, method }) {
 
     try {
       const response = await api.post(apiRoute, { username, password });
-      if (mode === "login") {
+
+      if (method === "login") {
         localStorage.setItem(ACCESS_TOKEN, response.data.access);
         localStorage.setItem(REFRESH_TOKEN, response.data.refresh);
         navigate("/");
       } else {
-        setMode("login");
         notify({
           message: "Registration was successful. Please log in",
           type: "success",
         });
+        navigate("/login");
       }
     } catch (error) {
       notify({ message: String(error), type: "error" });
@@ -59,11 +59,11 @@ function Form({ route, method }) {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
-      <button className="form-button" type="submit">
-        {name}
+      <button className="form-button" type="submit" disabled={loading}>
+        {loading ? "Loading..." : name}
       </button>
-      <button type="button" className="form-switch" onClick={toggleMode}>
-        {mode === "login" ? "Switch to Register" : "Switch to Login"}
+      <button type="button" className="form-switch" onClick={onSwitch}>
+        {switchButtonText}
       </button>
     </form>
   );
