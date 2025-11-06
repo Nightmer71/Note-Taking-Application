@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNotification } from "../components/NotificationProvider";
+import { useNavigate } from "react-router-dom";
 import Note from "../components/Note";
 import * as noteService from "../services/noteService";
 import * as categoryService from "../services/categoryService";
@@ -12,6 +13,7 @@ function Home() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const { notify } = useNotification();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadNotes();
@@ -97,21 +99,35 @@ function Home() {
 
         <label htmlFor="category">Category:</label>
         <br />
-        <select
-          id="category"
-          value={selectedCategory}
-          required
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="">--Choose Category--</option>
-          {categories.map((c) => {
-            return (
-              <option value={c.id} key={c.id}>
-                {c.name}
-              </option>
-            );
-          })}
-        </select>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <select
+            id="category"
+            value={selectedCategory}
+            required
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="">--Choose Category--</option>
+            {categories.map((c) => {
+              return (
+                <option value={c.id} key={c.id}>
+                  {c.name}
+                </option>
+              );
+            })}
+          </select>
+          <button
+            type="button"
+            onClick={() => navigate("/categories")}
+            style={{
+              marginLeft: "4px",
+              padding: "6px 10px",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Create Category
+          </button>
+        </div>
         <br />
         <input type="submit" value="Submit" />
       </form>

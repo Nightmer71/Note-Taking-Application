@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../api";
+import LoadingIndicator from "../components/LoadingIndicator";
 import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNotification } from "../components/NotificationProvider";
@@ -59,6 +60,7 @@ function Form({ route, method, onSwitch }) {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
       />
+      {loading && <LoadingIndicator />}
       <button className="form-button" type="submit" disabled={loading}>
         {loading ? "Loading..." : name}
       </button>

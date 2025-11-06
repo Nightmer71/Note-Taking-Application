@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import {
   NotificationProvider,
   useNotification,
 } from "../components/NotificationProvider";
+import "../styles/Categories.css";
 
 function Categories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const { notify } = useNotification();
@@ -37,37 +40,64 @@ function Categories() {
 
   const deleteCategory = (id) => {
     api
-      .delete(`/api/categories/${id}`)
+      .delete(`/api/categories/${id}/`)
       .then((result) => {
         if (result.status === 204)
-          notify({ message: "Category deletes", type: "success" });
+          notify({ message: "Category deleted", type: "success" });
         getCategories();
       })
-      .catch((error) => notify({ message: String(error), type: "error" }));
+      .catch((error) => {
+        if (error.response && error.response.status === 409) {
+          notify({
+            message:
+              "Cannot delete category because it has notes assigned to it. Please reassign or delete the notes first.",
+            type: "error",
+          });
+        } else {
+          notify({ message: String(error), type: "error" });
+        }
+      });
   };
 
   return (
-    <div>
-      <h2>Categories</h2>
-      <ul>
+    <div className="categories-container">
+      <div className="header-section">
+        <button className="back-button" onClick={() => navigate("/")}>
+          Back to Notes
+        </button>
+        <h2>Categories</h2>
+      </div>
+      <ul className="categories-list">
         {categories.map((c) => (
-          <li key={c.id}>
-            {c.name}{" "}
-            <button onClick={() => deleteCategory(c.id)}>Delete</button>
+          <li key={c.id} className="category-item">
+            <span className="category-name">{c.name}</span>
+            <div className="category-buttons">
+              <button onClick={() => navigate(`/categories/update/${c.id}`)}>
+                Update
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => deleteCategory(c.id)}
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
 
-      <h3>Create Category</h3>
-      <form onSubmit={createCategory}>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Name"
-          required
-        />
-        <button type="submit">Create</button>
-      </form>
+      <div className="create-category-form">
+        <h3>Create Category</h3>
+        <form onSubmit={createCategory}>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Category Name"
+            required
+          />
+          <button type="submit">Create</button>
+        </form>
+      </div>
     </div>
   );
 }

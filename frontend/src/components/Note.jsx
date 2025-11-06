@@ -1,8 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Note.css";
 
 function Note({ note, onDelete }) {
-  const formattedDate = new Date(Note.created_at).toLocaleDateString("hu");
+  const navigate = useNavigate();
+  const formattedDate = new Date(note.created_at).toLocaleDateString("hu");
 
   return (
     <div className="note-container">
@@ -12,9 +14,17 @@ function Note({ note, onDelete }) {
         <p className="note-category">Category: {note.category_name}</p>
       )}
       <p className="note-date">{formattedDate}</p>
-      <button className="delete-btn" onClick={() => onDelete(note.id)}>
-        Delete Note
-      </button>
+      <div className="note-buttons">
+        <button
+          className="update-btn"
+          onClick={() => navigate(`/notes/update/${note.id}`)}
+        >
+          Update Note
+        </button>
+        <button className="delete-btn" onClick={() => onDelete(note.id)}>
+          Delete Note
+        </button>
+      </div>
     </div>
   );
 }
