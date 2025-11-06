@@ -8,6 +8,9 @@ function Note({ note, onDelete }) {
     <div className="note-container">
       <p className="note-title">{note.title}</p>
       <p className="note-content">{note.content}</p>
+      {note.category_name && (
+        <p className="note-category">Category: {note.category_name}</p>
+      )}
       <p className="note-date">{formattedDate}</p>
       <button className="delete-btn" onClick={() => onDelete(note.id)}>
         Delete Note

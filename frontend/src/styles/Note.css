@@ -9,7 +9,8 @@
   color: #333;
 }
 
-.note-content {
+.note-content,
+.note-category {
   color: #666;
 }
 
