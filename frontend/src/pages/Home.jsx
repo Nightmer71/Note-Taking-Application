@@ -1,49 +1,65 @@
 import { useState, useEffect } from "react";
-import api from "../api";
+import { useNotification } from "../components/NotificationProvider";
 import Note from "../components/Note";
+import * as noteService from "../services/noteService";
+import * as categoryService from "../services/categoryService";
 import "../styles/Home.css";
 
 function Home() {
   const [notes, setNotes] = useState([]);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
-
-  const getNotes = () => {
-    api
-      .get("/api/notes/")
-      .then((result) => result.data)
-      .then((data) => {
-        setNotes.data;
-        console.log(data);
-      })
-      .catch((error) => alert.error);
-  };
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const { notify } = useNotification();
 
   useEffect(() => {
-    getNotes();
+    loadNotes();
+    loadCategories();
   }, []);
 
+  const loadNotes = () => {
+    noteService
+      .getNotes()
+      .then((result) => result.data)
+      .then((data) => setNotes(data))
+      .catch((error) => notify({ message: String(error), type: "error" }));
+  };
+
+  const loadCategories = () => {
+    categoryService
+      .getCategories()
+      .then((result) => result.data)
+      .then((data) => setCategories(data))
+      .catch((error) => notify({ message: String(error), type: "error" }));
+  };
+
   const deleteNote = (id) => {
-    api
-      .delete(`/api/notes/delete/${id}/`)
+    noteService
+      .deleteNote(id)
       .then((result) => {
-        if (result.status === 204) alert("Note has been deleted!");
-        else alert("Failed to delete note!");
-        getNotes();
+        if (result.status === 204)
+          notify({ message: "Note has been deleted!", type: "success" });
+        else notify({ message: "Failed to delete note!", type: "error" });
+        loadNotes();
       })
-      .catch((error) => alert(error));
+      .catch((error) => notify({ message: String(error), type: "error" }));
   };
 
   const createNote = (e) => {
     e.preventDefault();
-    api
-      .post("/api/notes", { content, title })
+    noteService
+      .createNote({ content, title, category: selectedCategory })
       .then((result) => {
-        if (result.status === 201) alert("Note has been created!");
-        else "Failed to create note!";
-        getNotes();
+        if (result.status === 201) {
+          notify({ message: "Note succesfully created!", type: "success" });
+          setTitle("");
+          setContent("");
+          setSelectedCategory("");
+        } else notify({ message: "Failed to create note!", type: "error" });
+        loadNotes();
       })
-      .catch((error) => alert(error));
+      .catch((error) => notify({ message: String(error), type: "error" }));
   };
 
   return (
@@ -51,7 +67,7 @@ function Home() {
       <div>
         <h2>Notes</h2>
         {notes.map((note) => {
-          <Note note={note} onDelete={deleteNote} key={note.id} />;
+          return <Note note={note} onDelete={deleteNote} key={note.id} />;
         })}
       </div>
       <h2>Create a Note</h2>
@@ -66,19 +82,41 @@ function Home() {
           onChange={(e) => setTitle(e.target.value)}
           value={title}
         />
+        <br />
 
         <label htmlFor="content">Content:</label>
         <br />
         <textarea
-          id="content"
           name="content"
+          id="content"
           required
           value={content}
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
+        <br />
+
+        <label htmlFor="category">Category:</label>
+        <br />
+        <select
+          id="category"
+          value={selectedCategory}
+          required
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value="">--Choose Category--</option>
+          {categories.map((c) => {
+            return (
+              <option value={c.id} key={c.id}>
+                {c.name}
+              </option>
+            );
+          })}
+        </select>
+        <br />
         <input type="submit" value="Submit" />
       </form>
     </div>
   );
 }
+
 export default Home;

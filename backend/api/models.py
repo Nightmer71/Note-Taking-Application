@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Note(models.Model):
         title = models.CharField(max_length=100)
-        content = models.TextField
+        content = models.TextField(null=True, blank=True)
         created_at = models.DateTimeField(auto_now_add=True)
         author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
         category = models.ForeignKey("Category", on_delete=models.PROTECT, related_name="notes", null=True, blank=True)
