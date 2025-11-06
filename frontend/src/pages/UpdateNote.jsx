@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getNoteDetail, updateNote } from "../services/noteService";
 import { getCategories } from "../services/categoryService";
-import "../styles/Home.css";
+import "../styles/UpdateNote.css";
 
 function UpdateNote() {
         const { id } = useParams();
@@ -82,6 +82,7 @@ function UpdateNote() {
                                 <div className="form-group">
                                         <label htmlFor="title">Title:</label>
                                         <input
+                                                className="form-input"
                                                 type="text"
                                                 id="title"
                                                 name="title"
